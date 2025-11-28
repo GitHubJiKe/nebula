@@ -16,7 +16,40 @@ Nebula is a specialized markdown editor for tech professionals.
 - **Charts**: Embed charts directly using JSON.
 - **AI Assist**: Powered by Gemini.
 
-### 1. Data Visualization
+### 1. Multi-Language Support
+
+#### Python
+\`\`\`python
+def analyze_data(data):
+    # This is a comment
+    results = [x * 2 for x in data if x > 0]
+    return {"status": "success", "data": results}
+\`\`\`
+
+#### TypeScript (React)
+\`\`\`tsx
+interface Props {
+  title: string;
+}
+
+const Header: React.FC<Props> = ({ title }) => {
+  return (
+    <header className="bg-slate-900 p-4">
+      <h1>{title}</h1>
+    </header>
+  );
+};
+\`\`\`
+
+#### Rust
+\`\`\`rust
+fn main() {
+    let message = "Hello, Nebula!";
+    println!("{}", message);
+}
+\`\`\`
+
+### 2. Data Visualization
 
 #### Bar Chart (Deployments)
 \`\`\`chart
@@ -32,25 +65,6 @@ Nebula is a specialized markdown editor for tech professionals.
   "series": [
     {"key": "deployments", "color": "#0ea5e9"},
     {"key": "bugs", "color": "#ef4444"}
-  ]
-}
-\`\`\`
-
-#### Line Chart (Traffic Trend)
-\`\`\`chart
-{
-  "type": "line",
-  "title": "API Traffic (Requests/sec)",
-  "xKey": "time",
-  "data": [
-    {"time": "10:00", "requests": 1200},
-    {"time": "11:00", "requests": 1900},
-    {"time": "12:00", "requests": 3500},
-    {"time": "13:00", "requests": 2800},
-    {"time": "14:00", "requests": 1500}
-  ],
-  "series": [
-    {"key": "requests", "color": "#22c55e"}
   ]
 }
 \`\`\`
@@ -73,7 +87,7 @@ Nebula is a specialized markdown editor for tech professionals.
 }
 \`\`\`
 
-### 2. Live Metrics (D3)
+### 3. Live Metrics (D3)
 
 Use the \`viz\` block for gauges and progress indicators.
 
@@ -97,7 +111,7 @@ Use the \`viz\` block for gauges and progress indicators.
 }
 \`\`\`
 
-### 3. Terminal Output
+### 4. Terminal Output
 \`\`\`terminal
 npm install nebula-md
 npm run build

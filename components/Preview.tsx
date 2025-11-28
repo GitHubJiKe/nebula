@@ -1,14 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ChartConfig, D3VizConfig } from '../types';
 import { ChartRenderer, D3VizRenderer, InfoBlock, TerminalBlock } from './CustomRenderers';
+
+// Access global Prism object from window
+declare const Prism: any;
 
 interface PreviewProps {
   content: string;
 }
 
 const Preview: React.FC<PreviewProps> = ({ content }) => {
+  // Trigger Prism highlighting whenever content changes
+  useEffect(() => {
+    if (typeof Prism !== 'undefined') {
+      const container = document.getElementById('preview-content');
+      if (container) {
+        Prism.highlightAllUnder(container);
+      }
+    }
+  }, [content]);
+
   return (
     <div className="h-full w-full bg-dark-bg overflow-y-auto custom-scrollbar relative">
        <div className="sticky top-0 left-0 right-0 h-6 bg-slate-900/90 backdrop-blur-sm border-b border-slate-800 flex items-center px-4 text-xs text-tech-400 select-none z-10">
@@ -18,6 +31,9 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
+            // Remove default pre wrapper so we can control the block completely in the 'code' renderer
+            pre: ({children}) => <>{children}</>,
+
             // --- Custom Heading Styles ---
             h1: ({node, ...props}) => <h1 className="text-3xl font-mono font-bold text-tech-100 mb-6 border-b border-slate-800 pb-2" {...props} />,
             h2: ({node, ...props}) => <h2 className="text-2xl font-mono font-bold text-tech-200 mb-4 mt-8" {...props} />,
@@ -66,15 +82,22 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
 
               return !inline && match ? (
                 <div className="relative group my-4">
-                  <div className="absolute top-2 right-2 text-[10px] text-slate-500 uppercase opacity-0 group-hover:opacity-100 transition-opacity select-none">
+                  <div className="absolute top-2 right-2 text-[10px] text-slate-500 uppercase opacity-0 group-hover:opacity-100 transition-opacity select-none z-10 font-bold tracking-wider">
                     {lang}
                   </div>
-                  <code className={`${className} block bg-slate-950 p-4 rounded-lg border border-slate-800 text-sm overflow-x-auto`} {...props}>
-                    {children}
-                  </code>
+                  {/* 
+                      Note: We use whitespace-pre-wrap to force wrapping of long lines. 
+                      We must include the <code> tag inside <pre> for PrismJS to work correctly.
+                      The CSS in index.html ensures Prism doesn't override the wrap property.
+                  */}
+                  <pre className="block bg-slate-950 p-4 rounded-lg border border-slate-800 text-sm whitespace-pre-wrap break-words overflow-x-auto">
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
+                  </pre>
                 </div>
               ) : (
-                <code className="bg-slate-800 text-tech-200 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                <code className="bg-slate-800 text-tech-200 px-1.5 py-0.5 rounded text-sm font-mono whitespace-pre-wrap break-words" {...props}>
                   {children}
                 </code>
               );

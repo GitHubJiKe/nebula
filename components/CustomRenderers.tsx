@@ -243,7 +243,7 @@ export const TerminalBlock: React.FC<{ children: React.ReactNode }> = ({ childre
         <div className="w-2.5 h-2.5 rounded-full bg-green-500/80"></div>
       </div>
     </div>
-    <div className="p-4 font-mono text-sm text-green-400">
+    <div className="p-4 font-mono text-sm text-green-400 whitespace-pre-wrap break-words">
        <span className="select-none text-slate-500 mr-2">$</span>
        {children}
     </div>
