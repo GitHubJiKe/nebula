@@ -16,13 +16,13 @@ Nebula is a specialized markdown editor for tech professionals.
 - **Charts**: Embed charts directly using JSON.
 - **AI Assist**: Powered by Gemini.
 
-### Interactive Charts
-Create charts by using the \`chart\` language block.
+### 1. Data Visualization
 
+#### Bar Chart (Deployments)
 \`\`\`chart
 {
   "type": "bar",
-  "title": "Monthly Deployments",
+  "title": "Monthly Deployments vs Bugs",
   "xKey": "month",
   "data": [
     {"month": "Jan", "deployments": 12, "bugs": 2},
@@ -36,26 +36,73 @@ Create charts by using the \`chart\` language block.
 }
 \`\`\`
 
-### D3 Visualization
-Create visuals with \`viz\` block.
-
-\`\`\`viz
+#### Line Chart (Traffic Trend)
+\`\`\`chart
 {
-  "type": "progress",
-  "value": 85,
-  "label": "System Health",
-  "color": "#22c55e"
+  "type": "line",
+  "title": "API Traffic (Requests/sec)",
+  "xKey": "time",
+  "data": [
+    {"time": "10:00", "requests": 1200},
+    {"time": "11:00", "requests": 1900},
+    {"time": "12:00", "requests": 3500},
+    {"time": "13:00", "requests": 2800},
+    {"time": "14:00", "requests": 1500}
+  ],
+  "series": [
+    {"key": "requests", "color": "#22c55e"}
+  ]
 }
 \`\`\`
 
-### Terminal Style
+#### Pie Chart (Infrastructure)
+\`\`\`chart
+{
+  "type": "pie",
+  "title": "Cost Distribution",
+  "xKey": "service",
+  "data": [
+    {"service": "Compute", "cost": 45},
+    {"service": "Storage", "cost": 25},
+    {"service": "Network", "cost": 20},
+    {"service": "Other", "cost": 10}
+  ],
+  "series": [
+    {"key": "cost", "color": "auto"}
+  ]
+}
+\`\`\`
+
+### 2. Live Metrics (D3)
+
+Use the \`viz\` block for gauges and progress indicators.
+
+#### System Load
+\`\`\`viz
+{
+  "type": "gauge",
+  "value": 78,
+  "label": "CPU Load",
+  "color": "#ef4444"
+}
+\`\`\`
+
+#### Disk Usage
+\`\`\`viz
+{
+  "type": "progress",
+  "value": 42,
+  "label": "Disk Space",
+  "color": "#3b82f6"
+}
+\`\`\`
+
+### 3. Terminal Output
 \`\`\`terminal
 npm install nebula-md
 npm run build
 > Build successful in 402ms
 \`\`\`
-
-Start typing to see the magic.
 `;
 
 const App: React.FC = () => {

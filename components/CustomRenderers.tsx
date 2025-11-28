@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer,
-  LineChart, Line, AreaChart, Area
+  LineChart, Line, AreaChart, Area, PieChart, Pie, Cell
 } from 'recharts';
 import * as d3 from 'd3';
 import { ChartConfig, D3VizConfig } from '../types';
 import { AlertCircle, Terminal } from 'lucide-react';
+
+const TECH_COLORS = ['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 // --- Recharts Renderer ---
 export const ChartRenderer: React.FC<{ config: ChartConfig }> = ({ config }) => {
@@ -24,7 +26,7 @@ export const ChartRenderer: React.FC<{ config: ChartConfig }> = ({ config }) => 
             />
             <Legend />
             {config.series.map((s) => (
-              <Line key={s.key} type="monotone" dataKey={s.key} stroke={s.color} strokeWidth={2} />
+              <Line key={s.key} type="monotone" dataKey={s.key} stroke={s.color} strokeWidth={2} activeDot={{ r: 6 }} />
             ))}
           </LineChart>
         );
@@ -42,6 +44,31 @@ export const ChartRenderer: React.FC<{ config: ChartConfig }> = ({ config }) => 
               <Area key={s.key} type="monotone" dataKey={s.key} stroke={s.color} fill={s.color} fillOpacity={0.3} />
             ))}
           </AreaChart>
+        );
+      case 'pie':
+        const dataKey = config.series[0]?.key;
+        return (
+          <PieChart>
+             <Pie
+              data={config.data}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              outerRadius={80}
+              dataKey={dataKey}
+              nameKey={config.xKey}
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              stroke="#0f172a"
+            >
+              {config.data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={TECH_COLORS[index % TECH_COLORS.length]} />
+              ))}
+            </Pie>
+            <RechartsTooltip 
+               contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc' }}
+            />
+            <Legend />
+          </PieChart>
         );
       case 'bar':
       default:
@@ -128,6 +155,56 @@ export const D3VizRenderer: React.FC<{ config: D3VizConfig }> = ({ config }) => 
       g.append("text")
         .attr("text-anchor", "middle")
         .attr("dy", "2em")
+        .text(config.label)
+        .style("fill", "#94a3b8")
+        .style("font-size", "12px");
+    }
+
+    if (config.type === 'gauge') {
+      const gaugeRadius = radius - 10;
+      
+      // Scale for the gauge
+      const scale = d3.scaleLinear()
+        .domain([0, 100])
+        .range([-Math.PI / 2, Math.PI / 2]);
+
+      // Background Arc (Semi-circle)
+      const arcBg = d3.arc()
+        .innerRadius(gaugeRadius - 15)
+        .outerRadius(gaugeRadius)
+        .startAngle(-Math.PI / 2)
+        .endAngle(Math.PI / 2);
+
+      g.append("path")
+        .attr("d", arcBg as any)
+        .style("fill", "#334155");
+
+      // Value Arc
+      const arcVal = d3.arc()
+        .innerRadius(gaugeRadius - 15)
+        .outerRadius(gaugeRadius)
+        .startAngle(-Math.PI / 2)
+        .cornerRadius(5);
+
+      g.append("path")
+        .datum({ endAngle: scale(config.value) })
+        .style("fill", config.color || "#22c55e")
+        .attr("d", arcVal as any);
+
+      // Value Text
+      g.append("text")
+        .attr("text-anchor", "middle")
+        .attr("dy", "0em")
+        .text(config.value)
+        .style("fill", "#e2e8f0")
+        .style("font-size", "28px")
+        .style("font-weight", "bold")
+        .style("font-family", "JetBrains Mono");
+
+      // Label Text
+      g.append("text")
+        .attr("text-anchor", "middle")
+        .attr("dy", "1.5em")
         .text(config.label)
         .style("fill", "#94a3b8")
         .style("font-size", "12px");

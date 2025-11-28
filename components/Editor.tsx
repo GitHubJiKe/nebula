@@ -19,6 +19,7 @@ const CodeEditor: React.FC<EditorProps> = ({ value, onChange, showSearch, onClos
   const [matches, setMatches] = useState<number[]>([]);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   // Shortcut for Ctrl+F handling to close search
   useEffect(() => {
@@ -82,12 +83,23 @@ const CodeEditor: React.FC<EditorProps> = ({ value, onChange, showSearch, onClos
     if (textarea) {
       textarea.focus();
       textarea.setSelectionRange(start, end);
-      
-      // Attempt to scroll into view - native textarea scroll behavior
-      // A more complex implementation would calculate line heights
-      const lines = value.substring(0, start).split('\n').length;
-      const lineHeight = 21; // approx
-      // textarea.scrollTop = lines * lineHeight - 100; 
+    }
+
+    if (scrollRef.current) {
+        const textBefore = value.substring(0, start);
+        const lineCount = textBefore.split('\n').length;
+        // 14px * 1.6 = 22.4px line height (approximate based on CSS)
+        const lineHeight = 22.4; 
+        
+        // Calculate target scroll position to center the line
+        // (lineCount - 1) accounts for 0-based index for multiplication
+        const targetY = (lineCount - 1) * lineHeight;
+        const containerHeight = scrollRef.current.clientHeight;
+        
+        scrollRef.current.scrollTo({
+            top: targetY - (containerHeight / 2) + lineHeight,
+            behavior: 'smooth'
+        });
     }
   };
 
@@ -287,7 +299,7 @@ const CodeEditor: React.FC<EditorProps> = ({ value, onChange, showSearch, onClos
         </div>
       )}
 
-      <div className="flex-1 overflow-auto custom-scrollbar relative">
+      <div className="flex-1 overflow-auto custom-scrollbar relative" ref={scrollRef}>
         <Editor
           value={value}
           onValueChange={onChange}
